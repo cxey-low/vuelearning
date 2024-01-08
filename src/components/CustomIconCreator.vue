@@ -1,9 +1,20 @@
 <script setup lang="ts">
 
 import { ref, computed } from 'vue'
+
+
 const creator = ref([[{ row: 1, col: 1, bool: false }]])
 const text = ref('')
+
+
+
 const codeCreate = computed(() => {
+    let reg = /^[a-zA-Z_]+/
+    if (!text.value) {
+        return ref('输入变量名')
+    } else if (!reg.test(text.value)) {
+        return ref('非法变量名')
+    }
     let a: string = '0b'
     for (let row of creator.value) {
         for (let col of row) {
@@ -17,23 +28,23 @@ const codeCreate = computed(() => {
     return ref(a)
 })
 
-
-for (let row = 1; row < 6; row += 1) {
-    let a = [{ row: row, col: 1, bool: false }]
-    for (let col = 2; col < 8; col += 1) {
-        a.push({ row: row, col: col, bool: false })
+for (let col = 1; col < 9; col += 1) {
+    let a = [{ row: col, col: 1, bool: false }]
+    for (let row = 2; row < 6; row += 1) {
+        a.push({ row: col, col: row, bool: false })
     }
-    creator.value[row - 1] = a
+    creator.value[col - 1] = a
 
 }
 
-const clearAll = ()=>{
-    for(let row of creator.value){
-        for(let col of row){
-            col.bool=false
+const clearAll = () => {
+    for (let row of creator.value) {
+        for (let col of row) {
+            col.bool = false
         }
     }
 }
+
 
 /**
  * byte Heart[8] = {
@@ -51,23 +62,25 @@ const clearAll = ()=>{
 
 </script>
 <template>
-    <link href="node_modules\bootstrap\dist\css\bootstrap.css" rel="stylesheet">
     <div class="container-fluid">
         <div class="row text-center">
             <div class="col">
                 <label class="form-label">变量名：</label>
-                <input class="form-control" v-model="text">
+                <input class="form-control mx-auto" style="width: 10%;" v-model="text">
                 <button type="button" class="btn  btn-danger" @click="clearAll">清除</button>
-                <table class="text-center">
+                <table class="text-center mx-auto" id="codeCreator">
+
                     <tbody>
-                        <td v-for="rows in creator" :key="creator.indexOf(rows)">
-                            <tr v-for="col in rows" :key="10 * col.row + col.col">
+                        <tr v-for="rows in creator" :key="creator.indexOf(rows)">
+                            <td v-for="col in rows" :key="10 * col.row + col.col">
                                 <div class="btn-group">
-                                    <input class="form-check-input btn btn-primary" type="checkbox" v-model="col.bool">
+                                    <input class="form-check-input  btn "
+                                        :class="{ 'btn-primary': col.bool, 'btn-secondary': !col.bool }" type="checkbox"
+                                        v-model="col.bool">
 
                                 </div>
-                            </tr>
-                        </td>
+                            </td>
+                        </tr>
 
                     </tbody>
 
