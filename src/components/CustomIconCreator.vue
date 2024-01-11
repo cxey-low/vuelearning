@@ -86,7 +86,7 @@ const clearAll = () => {
 
                 </table>
 
-                <code>{{ codeCreate }}</code>
+                <code>{{ codeCreate.value }}</code>
             </div>
         </div>
     </div>
