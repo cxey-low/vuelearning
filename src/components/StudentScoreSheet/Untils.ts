@@ -8,6 +8,8 @@ export const filePapaReader = (f: File) => {
     delimiter: ',',
     complete: (results, file) => {
       console.log('🚀 ~ complete ~ results:', results)
+
+
       data = results.data
       data.forEach((f) => {
         
