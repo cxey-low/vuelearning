@@ -1,107 +1,48 @@
-import { parse } from 'papaparse'
+import { parse, type ParseResult } from 'papaparse'
+import { Group, Student, ExamDate, Sheet } from './classes'
 
 export const filePapaReader = (f: File) => {
-  let data: unknown[]
-  let groupids:number[]
+  let data: string[]
+  const groupids: number[] = []
+  const groupindexs: number[] = []
+  const groups: Group[] = []
+  let sheet: Sheet
 
   parse(f, {
     delimiter: ',',
-    complete: (results, file) => {
+    complete: (results: ParseResult<string>, file) => {
       console.log('🚀 ~ complete ~ results:', results)
 
-
       data = results.data
-      data.forEach((f) => {
-        
-        if (f[0]=='group') {
-          groupids.push(f[1].toString())
+      data.forEach((f, i) => {
+        if (f[0] == 'group') {
+          groupids.push(Number(f[1]))
+          groupindexs.push(i)
         }
-
-      
       })
-      console.log("🚀 ~ data.forEach ~ groupids:", groupids)
 
+      let students: Student[] = []
+
+      data.forEach((f) => {
+        if (f[0] != 'group') {
+          const student = new Student(f[0], Number(f[1]))
+          students.push(student)
+          console.log('🚀 ~ data.forEach ~ students:', students)
+        } else {
+          if (!groupids.length) {
+            groups.push(new Group(students, groupids[0]))
+          }
+          console.log('🚀 ~ data.forEach ~ students:', students)
+
+          console.log('🚀 ~ data.forEach ~ groupids:', groupids)
+
+          groupids.splice(0, 1)
+          console.log('🚀 ~ data.forEach ~ groupids:', groupids)
+          students = []
+        }
+      })
+      sheet = new Sheet(groups, null)
+      console.log('🚀 ~ filePapaReader ~ sheet:', sheet)
     }
   })
-}
-
-export class ExamDate {
-  date: Date
-  name: string
-  constructor(date: Date, name: string) {
-    this.date = date
-    this.name = name
-  }
-}
-
-export class Student {
-  name: string
-  score: number
-
-  constructor(name: string, score: number) {
-    this.name = name
-    this.score = score
-  }
-}
-export class Group {
-  students: Student[]
-  id: number
-  average: number
-
-  constructor(students: Student[], id: number) {
-    this.students = students
-    this.id = id
-    let a = 0
-    students.forEach((s) => {
-      a += s.score
-    })
-    this.average = Number((a / students.length).toFixed(2))
-  }
-
-  push(student: Student) {
-    this.students.push(student)
-    return this
-  }
-}
-export class StudentList {
-  students: Student[]
-  date: ExamDate
-  average: number
-
-  constructor(students: Student[], date: ExamDate) {
-    this.date = date
-    this.students = students
-
-    let a = 0
-    students.forEach((s) => {
-      a += s.score
-    })
-    this.average = Number((a / students.length).toFixed(2))
-  }
-
-  addGroup(group: Group) {
-    this.students = this.students.concat(this.students, group.students)
-    return this
-  }
-
-  addGroups(groups: Group[]) {
-    groups.forEach((f) => {
-      this.addGroup(f)
-    })
-    return this
-  }
-}
-export class Sheet {
-  groups: Group[]
-  date: ExamDate
-  sort: Group[]
-
-  constructor(groups: Group[], date: ExamDate) {
-    this.groups = groups
-    this.date = date
-
-    this.sort = this.groups.sort((x, y) => {
-      return x.average - y.average
-    })
-  }
 }

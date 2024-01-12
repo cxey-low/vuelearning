@@ -65,18 +65,24 @@ const clearAll = () => {
     <div class="container-fluid">
         <div class="row text-center">
             <div class="col">
-                <label class="form-label">变量名：</label>
-                <input class="form-control mx-auto" style="width: 10%;" v-model="text">
-                <button type="button" class="btn  btn-danger" @click="clearAll">清除</button>
+                <label class="form-label">变量名：
+                    <input class="form-control mx-auto" style="width: 10%;" v-model="text">
+                </label>
+                <label class="form-label">
+                    <button type="button" class="btn  btn-danger" @click="clearAll">清除</button>
+                </label>
                 <table class="text-center mx-auto" id="codeCreator">
 
                     <tbody>
                         <tr v-for="rows in creator" :key="creator.indexOf(rows)">
                             <td v-for="col in rows" :key="10 * col.row + col.col">
                                 <div class="btn-group">
-                                    <input class="form-check-input  btn "
-                                        :class="{ 'btn-primary': col.bool, 'btn-secondary': !col.bool }" type="checkbox"
-                                        v-model="col.bool">
+                                    <label>
+                                        <input class="form-check-input  btn "
+                                            :class="{ 'btn-primary': col.bool, 'btn-secondary': !col.bool }" type="checkbox"
+                                            v-model="col.bool">
+                                    </label>
+
 
                                 </div>
                             </td>
