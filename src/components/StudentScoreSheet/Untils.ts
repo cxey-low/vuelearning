@@ -1,48 +1,45 @@
 import { parse, type ParseResult } from 'papaparse'
-import { Group, Student, ExamDate, Sheet } from './classes'
+import { Group, Student, ExamDate, Sheet, SheetResult, SheetResultNumber } from './classes'
+import _ from 'underscore'
+
+export let sheetFile: Sheet
 
 export const filePapaReader = (f: File) => {
-  let data: string[]
-  const groupids: number[] = []
+  let data: SheetResultNumber[]
+  let groupids: number[] = []
   const groupindexs: number[] = []
   const groups: Group[] = []
-  let sheet: Sheet
+  
 
   parse(f, {
     delimiter: ',',
-    complete: (results: ParseResult<string>, file) => {
-      console.log('🚀 ~ complete ~ results:', results)
-
-      data = results.data
-      data.forEach((f, i) => {
-        if (f[0] == 'group') {
-          groupids.push(Number(f[1]))
-          groupindexs.push(i)
-        }
+    complete: (results: ParseResult<SheetResult>) => {
+      data = results.data.map((f) => {
+        return new SheetResultNumber(f)
       })
+      console.log('🚀 ~ filePapaReader ~ data:', data)
 
-      let students: Student[] = []
+      //groupids
+      data.forEach((f) => {
+        groupids.push(f.group)
+      })
+      groupids = _.uniq(groupids)
+      console.log('🚀 ~ filePapaReader ~ groupids:', groupids)
+
+      //groups
+      groupids.forEach((f) => {
+        groups.push(new Group(null, f))
+        console.log('🚀 ~ groupids.forEach ~ groups:', groups)
+      })
 
       data.forEach((f) => {
-        if (f[0] != 'group') {
-          const student = new Student(f[0], Number(f[1]))
-          students.push(student)
-          console.log('🚀 ~ data.forEach ~ students:', students)
-        } else {
-          if (!groupids.length) {
-            groups.push(new Group(students, groupids[0]))
-          }
-          console.log('🚀 ~ data.forEach ~ students:', students)
-
-          console.log('🚀 ~ data.forEach ~ groupids:', groupids)
-
-          groupids.splice(0, 1)
-          console.log('🚀 ~ data.forEach ~ groupids:', groupids)
-          students = []
-        }
+        groups[f.group - 1].push(new Student(f.name, f.score)).setAverage()
       })
-      sheet = new Sheet(groups, null)
-      console.log('🚀 ~ filePapaReader ~ sheet:', sheet)
-    }
+
+      sheetFile = new Sheet(groups, null)
+      console.log('🚀 ~ filePapaReader ~ sheet:', sheetFile)
+      
+    },
+    header: true
   })
 }

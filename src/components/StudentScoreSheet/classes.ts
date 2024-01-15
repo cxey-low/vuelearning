@@ -21,7 +21,7 @@ export class Group {
   id: number
   average: number = 0
 
-  constructor(students: Student[], id: number) {
+  constructor(students: Student[] | null, id: number) {
     this.id = id
     if (students != null) {
       this.students = students
@@ -35,11 +35,17 @@ export class Group {
       a += s.score
     })
     this.average = Number((a / this.students.length).toFixed(2))
+    return this
   }
 
   push(student: Student) {
-    this.students.push(student)
-    return this
+    if (!this.students) {
+      this.students = [student]
+      return this
+    } else {
+      this.students.push(student)
+      return this
+    }
   }
 }
 export class StudentList {
@@ -71,17 +77,45 @@ export class StudentList {
   }
 }
 export class Sheet {
-  groups: Group[]
-  date: ExamDate
-  sort: Group[]
+  groups: Group[] | null
+  date: ExamDate | null
+  sort: Group[] | null
 
-  constructor(groups: Group[], date: ExamDate|null) {
+  constructor(groups: Group[] | null, date: ExamDate | null) {
     this.groups = groups
 
-    this.date = date?date:new ExamDate(new Date(), Date())
+    this.date = date ? date : new ExamDate(new Date(), Date())
 
-    this.sort = this.groups.sort((x, y) => {
-      return x.average - y.average
-    })
+    this.sort = this.groups
+      ? this.groups.sort((x, y) => {
+          return x.average - y.average
+        })
+      : null
+  }
+}
+
+export class SheetResult {
+  name: string
+  score: string
+  group: string
+  groupscore: string
+  constructor(name: string, score: string, group: string, groupscore: string) {
+    this.name = name
+    this.score = score
+    this.group = group
+    this.groupscore = groupscore
+  }
+}
+
+export class SheetResultNumber {
+  name: string
+  score: number
+  group: number
+  groupscore: number
+  constructor(sheetResult: SheetResult) {
+    this.name = sheetResult.name
+    this.score = Number(sheetResult.score)
+    this.group = Number(sheetResult.group)
+    this.groupscore = Number(sheetResult.groupscore)
   }
 }

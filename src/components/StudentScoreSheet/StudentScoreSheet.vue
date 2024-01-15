@@ -1,25 +1,23 @@
 <script setup lang="ts">
 
-import { ref } from 'vue'
+import { ref ,type Ref} from 'vue'
 import $ from 'jquery'
-import { filePapaReader } from './Untils'
+import { filePapaReader,sheetFile } from './Untils'
+import { Group, Student, ExamDate, Sheet, SheetResult, SheetResultNumber } from './classes'
+import SheetRender from './SheetRender.vue'
+
 
 const jsonfile = ref('')
 const downloadFile = ref('')
 const downloadName = ref('')
 const csvstring = ref('')
+const sheetRender:Ref<Sheet|null> = ref(null)
 
 const fileReader = (event: Event) => {
 
-    let file: File = event.target.files[0]
-    console.log("🚀 ~ fileReader ~ file:", file)
-
+    let file: File = event.target.files[0] 
     filePapaReader(file)
-
-    console.log(1);
-
-
-
+    sheetRender.value = sheetFile
 
 }
 
@@ -41,6 +39,7 @@ const fileOutput = (event: Event): void => {
                 <input @change="fileReader" id="file" type="file">
                 <p>{{ jsonfile }}</p>
                 <a :href="downloadFile" :download="downloadName" @click="fileOutput">导出</a>
+                
             </div>
         </div>
 
