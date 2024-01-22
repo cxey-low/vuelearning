@@ -119,3 +119,15 @@ export class SheetResultNumber {
     this.groupscore = Number(sheetResult.groupscore)
   }
 }
+
+/**
+ * {
+    "groups": null,
+    "date": {
+        "date": "2024-01-22T04:40:37.701Z",
+        "name": "Mon Jan 22 2024 12:40:37 GMT+0800 (中国标准时间)"
+    },
+    "sort": null
+}
+ */
+

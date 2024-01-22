@@ -1,23 +1,25 @@
 <script setup lang="ts">
 
-import { ref ,type Ref} from 'vue'
+import { ref, type Ref, computed } from 'vue'
 import $ from 'jquery'
-import { filePapaReader,sheetFile } from './Untils'
+import { filePapaReader } from './Untils'
 import { Group, Student, ExamDate, Sheet, SheetResult, SheetResultNumber } from './classes'
-import SheetRender from './SheetRender.vue'
 
 
-const jsonfile = ref('')
 const downloadFile = ref('')
 const downloadName = ref('')
 const csvstring = ref('')
-const sheetRender:Ref<Sheet|null> = ref(null)
+let sheetRender: Sheet | undefined = new Sheet(null, null)
+const sheetRef = ref(sheetRender)
 
-const fileReader = (event: Event) => {
-
-    let file: File = event.target.files[0] 
-    filePapaReader(file)
-    sheetRender.value = sheetFile
+const fileReader = () => {
+    let file: File | undefined = document.getElementById('file')?.files[0]
+    let result = filePapaReader(file)
+    console.log("🚀 ~ fileReader ~ result:", result)
+    if (typeof result != 'undefined') {
+        sheetRef.value = result
+    }
+    console.log("🚀 ~ fileReader ~ sheetRef.value:", sheetRef.value)
 
 }
 
@@ -35,11 +37,28 @@ const fileOutput = (event: Event): void => {
     <div class="container-fluid">
         <div class="row text-center">
             <div class="col">
-
                 <input @change="fileReader" id="file" type="file">
-                <p>{{ jsonfile }}</p>
                 <a :href="downloadFile" :download="downloadName" @click="fileOutput">导出</a>
-                
+                <!-- eslint-disable vue/no-parsing-error -->
+
+                <table class="table table-bordered text-center mx-auto">
+                    <tbody>
+                        <tr v-for="student_group of sheetRef.groups" :key="student_group.id">
+                            <p class="text-center mx-auto">{{ student_group.id }}</p>
+                            <td v-for="student of student_group.students" :key="student.name">
+                        <tr>
+                            <p class="text-center mx-auto">{{ student.name }}</p>
+                        </tr>
+                        <td>
+                            <p class="text-center mx-auto">{{ student.score }}</p>
+                        </td>
+                        </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+
             </div>
         </div>
 
