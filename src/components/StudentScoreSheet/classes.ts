@@ -2,7 +2,7 @@ export class ExamDate {
   date: Date
   name: string
   constructor(date: Date, name: string) {
-    this.date = date
+    this.date = date 
     this.name = name
   }
 }
@@ -120,14 +120,97 @@ export class SheetResultNumber {
   }
 }
 
-/**
- * {
-    "groups": null,
-    "date": {
-        "date": "2024-01-22T04:40:37.701Z",
-        "name": "Mon Jan 22 2024 12:40:37 GMT+0800 (中国标准时间)"
+const default_obj = {
+  groups: [
+    {
+      students: [
+        {
+          name: 'cs',
+          score: 20
+        },
+        {
+          name: 'gh',
+          score: 56
+        },
+        {
+          name: 'ty',
+          score: 60
+        }
+      ],
+      id: 1,
+      average: 45.33
     },
-    "sort": null
+    {
+      students: [
+        {
+          name: 'hj',
+          score: 57
+        },
+        {
+          name: 'di',
+          score: 90
+        },
+        {
+          name: 'ck',
+          score: 40
+        }
+      ],
+      id: 2,
+      average: 62.33
+    }
+  ],
+  date: {
+    date: '2024-01-23T05:16:26.859Z',
+    name: 'Tue Jan 23 2024 13:16:26 GMT+0800 (中国标准时间)'
+  },
+  sort: [
+    {
+      students: [
+        {
+          name: 'cs',
+          score: 20
+        },
+        {
+          name: 'gh',
+          score: 56
+        },
+        {
+          name: 'ty',
+          score: 60
+        }
+      ],
+      id: 1,
+      average: 45.33
+    },
+    {
+      students: [
+        {
+          name: 'hj',
+          score: 57
+        },
+        {
+          name: 'di',
+          score: 90
+        },
+        {
+          name: 'ck',
+          score: 40
+        }
+      ],
+      id: 2,
+      average: 62.33
+    }
+  ]
 }
- */
 
+const default_groups: Group[] = default_obj.groups.map((gr) => {
+  const default_students: Student[] = gr.students.map((st) => {
+    return new Student(st.name, st.score)
+  })
+  return new Group(default_students, gr.id)
+})
+
+export const DEFAULT_SHEET: Sheet = new Sheet(
+  default_groups,
+  new ExamDate(new Date(default_obj.date.date), default_obj.date.name)
+)
