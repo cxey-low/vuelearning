@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import { ref, type Ref, computed } from 'vue'
-import { Group, Student, ExamDate, Sheet, SheetResult, SheetResultNumber, DEFAULT_SHEET } from './classes'
+import { Group, Student, ExamDate, Sheet, SheetResult, SheetResultNumber, DEFAULT_SHEET, DEFAULT_LINE } from './classes'
 import _ from 'underscore'
 import { parse, type ParseResult } from 'papaparse'
 
@@ -12,10 +12,14 @@ const downloadName = ref('')
 const csvstring = ref('')
 const sheet = ref(DEFAULT_SHEET)
 const sheetRef = computed(() => {
+    sheet.value.groups?.forEach((g) => {
+        g.setAverage()
+    })
+    sheet.value.setSort()
     return sheet
 })
 
-let date:ExamDate = DEFAULT_SHEET.date
+let date: ExamDate = DEFAULT_SHEET.date
 let date_ref = ref(date)
 
 const filePapaReader = (f: File | undefined) => {
@@ -52,7 +56,7 @@ const filePapaReader = (f: File | undefined) => {
         },
         header: true
     })
-
+    fileOutput()
 }
 
 
@@ -64,11 +68,25 @@ const fileReader = () => {
 }
 
 
-const fileOutput = (event: Event): void => {
+const fileOutput = (): void => {
 
-    let file = new Blob([`1,2,3,4`], { type: 'text/csv' })
+    let sheet_file: string[] = [DEFAULT_LINE]
+
+    sheet.value.groups?.forEach(g => {
+        let line: string[] = []
+        g.students.forEach(s => {
+            line.push(`${s.name},${s.score},${g.id},${g.average}\n`)
+        })
+        sheet_file = sheet_file.concat(line)
+    })
+    console.log("🚀 ~ fileOutput ~ sheet_file:", sheet_file)
+
+
+
+
+    let file = new Blob(sheet_file, { type: 'text/csv' })
     downloadFile.value = window.URL.createObjectURL(file)
-    downloadName.value = 'output.csv'
+    downloadName.value = `${sheet.value.date?.name}`
 
 }
 
@@ -87,21 +105,22 @@ const fileOutput = (event: Event): void => {
                 <p @click="console.log(sheetRef)">sheetRef</p>
                 <p>{{ sheetRef }}</p>
                 <p>{{ csvstring }}</p>
-                
+
                 <label class="form-label">
-                    
+
                     <input type="text" class="form-control" v-model="csvstring">
-                    <input type="text" class="form-control" v-model="date_ref.name">
-                    <input type="date" class="form-control" v-model="date_ref.date">
+                    <input type="text" class="form-control" v-model="sheetRef.value.date.name">
+                    <input type="date" class="form-control" v-model="sheetRef.value.date.date">
                 </label>
                 <table class="table table-bordered text-center mx-auto">
                     <tbody>
-                        <tr v-for="student_group of sheetRef.value.groups" :key="student_group.id">
+                        <tr v-for="student_group of sheetRef.value.sort" :key="student_group.id">
                             <label class="form-label">
                                 <input type="number" class="form-control" v-model.number="student_group.id">
                             </label>
+                            <p>{{ student_group.average }}</p>
                             <td v-for="student of student_group.students" :key="student.name">
-                        <tr> 
+                        <tr>
                             <label class="form-label">
                                 <input type="text" class="form-control" v-model="student.name">
                             </label>

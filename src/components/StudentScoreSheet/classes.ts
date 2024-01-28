@@ -75,11 +75,24 @@ export class StudentList {
     })
     return this
   }
+
 }
+
+export const DEFAULT_LINE = 'name,score,group,groupscore\n'
+
 export class Sheet {
   groups: Group[] | null
   date: ExamDate | null
   sort: Group[] | null
+
+  setSort(){
+    this.sort = this.groups
+      ? this.groups.sort((x, y) => {
+          return Number(!(x.average - y.average))
+        })
+      : null
+      return this
+  }
 
   constructor(groups: Group[] | null, date: ExamDate | null) {
     this.groups = groups
@@ -92,6 +105,8 @@ export class Sheet {
         })
       : null
   }
+
+
 }
 
 export class SheetResult {
@@ -214,3 +229,4 @@ export const DEFAULT_SHEET: Sheet = new Sheet(
   default_groups,
   new ExamDate(new Date(default_obj.date.date), default_obj.date.name)
 )
+
