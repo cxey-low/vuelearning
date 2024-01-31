@@ -1,9 +1,35 @@
 export class ExamDate {
+  date_string:string
   date: Date
   name: string
   constructor(date: Date, name: string) {
     this.date = date 
     this.name = name
+    this.date_string = this.date.toTimeString()
+    
+  }
+
+  setDate(date:string){
+
+  }
+
+  dateToString(){
+    this.date_string = this.date.toTimeString()
+  }
+
+  endsWithCsv(){
+    return this.name.endsWith('.csv')
+  }
+
+  setName(name:string){
+    this.name = name
+    return this
+  }
+
+  addCsv(){
+    const name = this.name
+    this.setName(name.concat('.csv'))
+    return this
   }
 }
 
@@ -105,6 +131,7 @@ export class Sheet {
         })
       : null
   }
+
 
 
 }
